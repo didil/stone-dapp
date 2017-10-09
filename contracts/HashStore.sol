@@ -12,10 +12,12 @@ contract HashStore {
     uint public lastHashId;
     uint public price;
 
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    event NewHashStored(address indexed hashSender, bytes32 hashContent);
+    event OwnershipTransferred(address indexed _previousOwner, address indexed _newOwner);
+    event NewHashStored(address indexed _hashSender,uint _hashId, bytes32 _hashContent);
 
     function HashStore(uint _price) public {
+        require(_price > 0);
+
         owner = msg.sender;
         price = _price;
         lastHashId = 0;
@@ -40,7 +42,7 @@ contract HashStore {
         hashes[hashId].sender = msg.sender;
         hashes[hashId].content = hashContent;
 
-        NewHashStored(hashes[hashId].sender, hashes[hashId].content);
+        NewHashStored(hashes[hashId].sender, hashId, hashes[hashId].content);
     }
 
     function find(uint hashId) constant public returns (address hashSender, bytes32 hashContent) {

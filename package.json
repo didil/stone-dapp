@@ -1,5 +1,5 @@
 {
-  "name": "react-box",
+  "name": "stone-dapp",
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
@@ -32,6 +32,7 @@
     "http-proxy-middleware": "0.17.2",
     "jest": "18.1.0",
     "json-loader": "0.5.4",
+    "lodash": "^4.17.4",
     "object-assign": "4.1.0",
     "path-exists": "2.1.0",
     "postcss-loader": "1.0.0",
