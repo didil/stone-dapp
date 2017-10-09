@@ -29,6 +29,7 @@ contract('HashStore', function (accounts) {
       assert.equal(web3.toAscii(eventLog.args._hashContent).replace(/\u0000/g, ''), hashContent);
 
       hashId = eventLog.args._hashId.toNumber();
+      assert.equal(hashId, 1);
     });
 
     it("retrieves hash", async function () {

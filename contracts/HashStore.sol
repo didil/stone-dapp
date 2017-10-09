@@ -38,7 +38,7 @@ contract HashStore {
         // only save if service price paid
         require(msg.value >= price);
 
-        uint hashId = lastHashId++;
+        uint hashId = ++lastHashId;
         hashes[hashId].sender = msg.sender;
         hashes[hashId].content = hashContent;
 
