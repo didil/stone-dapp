@@ -6,6 +6,8 @@ It allows you to :
 - Receive a receipt for your text submission
 - Prove time of submission (via block timestamp)
 
+App live at #https://didil.github.io/stone-dapp/index.html
+
 This app was built using Truffle and React
 
 To deploy contract:
