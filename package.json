@@ -2,7 +2,7 @@
   "name": "stone-dapp",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://didil.github.io/stone-dapp-live",
+  "homepage": "https://didil.github.io/stone-dapp",
   "devDependencies": {
     "autoprefixer": "6.5.1",
     "babel-core": "6.17.0",
