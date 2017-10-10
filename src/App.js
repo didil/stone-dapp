@@ -8,6 +8,7 @@ var NotificationSystem = require('react-notification-system');
 var Loader = require('react-loader');
 
 import SubmitForm from './components/SubmitForm';
+import RecentSubmissions from './components/RecentSubmissions';
 
 const IPFS = require('ipfs-mini');
 
@@ -24,6 +25,7 @@ class App extends Component {
       web3: null,
       submitFormDisplayed: false,
       fetchFormDisplayed: false,
+      recentSubmissions: []
     }
   }
 
@@ -109,15 +111,60 @@ class App extends Component {
 
     hashStoreContract.deployed().then((hashStoreContractInstance) => {
       this.setState({hashStoreContractInstance});
+      this.loadRecentSubmissions();
     }).catch((err) => {
       this.addNotification(err.message, "error");
     });
   }
 
-  onSubmit(hashId){
+  loadSubmission(hashId) {
+    return new Promise((resolve, reject) => {
+      let submission = {};
+      this.state.hashStoreContractInstance.find(hashId).then((values) => {
+        submission.sender = values[0];
+        submission.hashContent = values[1];
+        submission.timestamp = values[2].toNumber();
+        submission.hashId = hashId;
+        this.state.ipfs.catJSON(submission.hashContent, (err, data) => {
+          if (err) {
+            console.log(err);
+            return resolve(submission);
+          }
+
+          submission.title = data.title;
+          submission.text = data.text;
+          submission.fullName = data.fullName;
+          resolve(submission);
+        });
+      }).catch((err) => {
+        return reject(err);
+      });
+    });
+  }
+
+  async loadRecentSubmissions() {
+    this.setState({loadingRecentSubmissions: true, recentSubmissions: []});
+    try {
+      let recentSubmissions = [];
+      let lastHashId = await this.state.hashStoreContractInstance.lastHashId();
+      lastHashId = lastHashId.toNumber();
+      const startHashId = Math.max(1, lastHashId - 5);
+      for (let i = lastHashId; i >= startHashId; i--) {
+        let submission = await this.loadSubmission(i);
+        recentSubmissions.push(submission);
+      }
+      this.setState({loadingRecentSubmissions: false, recentSubmissions: recentSubmissions});
+    }
+    catch (err) {
+      this.setState({loadingRecentSubmissions: false});
+      this.addNotification(err.message, "error");
+    }
+  }
+
+  onSubmit(hashId) {
     this.setState({submitFormDisplayed: false});
 
-    // load hash from contract then data from ipfs
+    this.loadRecentSubmissions();
   }
 
   showSubmitForm() {
@@ -154,8 +201,8 @@ class App extends Component {
 
         <main className="container">
           <div className="pure-g">
-            <div className="pure-u-1-5"></div>
-            <div className="pure-u-3-5">
+            <div className="pure-u-3-24"></div>
+            <div className="pure-u-18-24">
               <h1>Stone Dapp</h1>
               <p>Stone is a <b>Distributed Application (Dapp)</b> running on the Ethereum Blockchain.
                 <br/>
@@ -170,7 +217,7 @@ class App extends Component {
                   Receive a receipt for your text submission
                 </li>
                 <li>
-                  Prove time of submission (or ethereum block timestamp to be more specific)
+                  Prove time of submission (via block timestamp)
                 </li>
               </ul>
 
@@ -185,7 +232,7 @@ class App extends Component {
                       </button>
                       <button className="pure-button pure-button-primary"
                               onClick={() => this.showFetchForm()}
-                              disabled={this.state.fetchFormDisplayed}>
+                              disabled={true || this.state.fetchFormDisplayed}>
                         Fetch Previous Submission
                       </button>
 
@@ -193,12 +240,15 @@ class App extends Component {
                         <SubmitForm web3={this.state.web3} ipfs={this.state.ipfs}
                                     hashStoreContractInstance={this.state.hashStoreContractInstance}
                                     addNotification={this.addNotification.bind(this)}
-                                    onSubmit={this.onSubmit.bind(this)} />
+                                    onSubmit={this.onSubmit.bind(this)}/>
                         : null}
                     </div>
 
                     <div className="pure-u-1-1">
                       <h3>Recent Submissions</h3>
+                      <Loader loaded={!this.state.loadingRecentSubmissions}>
+                        <RecentSubmissions submissions={this.state.recentSubmissions}/>
+                      </Loader>
                     </div>
                   </div>
                   :
@@ -208,17 +258,17 @@ class App extends Component {
 
 
             </div>
-            <div className="pure-u-1-5"></div>
+            <div className="pure-u-3-24"></div>
           </div>
 
 
           <div className="pure-g footer-grid">
-            <div className="pure-u-1-5"></div>
-            <div className="pure-u-3-5">
+            <div className="pure-u-3-24"></div>
+            <div className="pure-u-18-24">
               <em>Created by Adil Haritah - 2017 - Follow me on <a href="https://twitter.com/le_didil">Twitter</a> <a
                 href="https://github.com/didil">Github</a> </em>
             </div>
-            <div className="pure-u-1-5"></div>
+            <div className="pure-u-3-24"></div>
           </div>
         </main>
       </div>

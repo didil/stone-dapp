@@ -4,7 +4,8 @@ pragma solidity ^0.4.11;
 contract HashStore {
     struct Hash{
         address sender;
-        bytes32 content;
+        string content;
+        uint timestamp;
     }
 
     mapping (uint => Hash) public hashes;
@@ -13,7 +14,7 @@ contract HashStore {
     uint public price;
 
     event OwnershipTransferred(address indexed _previousOwner, address indexed _newOwner);
-    event NewHashStored(address indexed _hashSender,uint _hashId, bytes32 _hashContent);
+    event NewHashStored(address indexed _hashSender,uint _hashId, string _hashContent, uint timestamp);
 
     function HashStore(uint _price) public {
         require(_price > 0);
@@ -34,18 +35,19 @@ contract HashStore {
         owner = newOwner;
     }
 
-    function save(bytes32 hashContent) payable public {
+    function save(string hashContent) payable public {
         // only save if service price paid
         require(msg.value >= price);
 
         uint hashId = ++lastHashId;
         hashes[hashId].sender = msg.sender;
         hashes[hashId].content = hashContent;
+        hashes[hashId].timestamp = block.timestamp;
 
-        NewHashStored(hashes[hashId].sender, hashId, hashes[hashId].content);
+        NewHashStored(hashes[hashId].sender, hashId, hashes[hashId].content, hashes[hashId].timestamp);
     }
 
-    function find(uint hashId) constant public returns (address hashSender, bytes32 hashContent) {
-        return (hashes[hashId].sender, hashes[hashId].content);
+    function find(uint hashId) constant public returns (address hashSender, string hashContent, uint hashTimestamp) {
+        return (hashes[hashId].sender, hashes[hashId].content, hashes[hashId].timestamp);
     }
 }

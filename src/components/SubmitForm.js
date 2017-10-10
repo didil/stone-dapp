@@ -49,7 +49,7 @@ class SubmitForm extends Component {
         event.stopWatching();
       });
 
-      this.props.hashStoreContractInstance.save(hash, {value: this.state.price}).catch((err) => {
+      this.props.hashStoreContractInstance.save(hash, {value: this.state.price,gas: 200000}).catch((err) => {
         this.setState({savingText: false});
         this.props.addNotification(err.message, "error");
         event.stopWatching();
@@ -57,9 +57,7 @@ class SubmitForm extends Component {
 
     });
 
-    /* ipfs.catJSON(result, (err, retrieved) => {
-       console.log(err, "we found:" + JSON.stringify(retrieved));
-     });*/
+
   }
 
   updateInputValue(e, field) {
@@ -91,9 +89,9 @@ class SubmitForm extends Component {
             ></textarea>
           </fieldset>
 
-          <Loader loaded={!this.state.loadingWeb3}>
+          <Loader loaded={!this.state.savingText}>
             <button type="button" className="pure-button pure-input-1-2 button-success"
-                    disabled={!this.validForm()} onClick={() => this.saveText()}>Save
+                    disabled={!this.validForm() || this.state.savingText} onClick={() => this.saveText()}>Save
             </button>
           </Loader>
         </form>
