@@ -41,7 +41,7 @@ class RecentSubmissions extends Component {
           </div>
           <div className="pure-u-5-5">
             <label>Timestamp:</label>
-            <span className="submission-timestamp" href="">{submission.timestamp} / {new Date(submission.timestamp).toISOString()}</span>
+            <span className="submission-timestamp" href="">{submission.timestamp} / {new Date(submission.timestamp*1000).toISOString()}</span>
           </div>
         </div>
       </div>);

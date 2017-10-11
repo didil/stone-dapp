@@ -94,9 +94,9 @@ class App extends Component {
         });
         cb();
       });
-    }).catch(() => {
+    }).catch((err) => {
       this.setState({loadingWeb3: false});
-      console.log('Error finding web3.')
+      console.log('Error finding web3.',err.message);
     });
   }
 
@@ -233,7 +233,7 @@ class App extends Component {
                       <button className="pure-button pure-button-primary"
                               onClick={() => this.showFetchForm()}
                               disabled={true || this.state.fetchFormDisplayed}>
-                        Fetch Previous Submission
+                        Fetch Previous Submission (To be implemented)
                       </button>
 
                       {this.state.submitFormDisplayed ?

@@ -6,9 +6,18 @@ It allows you to :
 - Receive a receipt for your text submission
 - Prove time of submission (via block timestamp)
 
+## Demo
+
 App live at #https://didil.github.io/stone-dapp/index.html
 
-This app was built using Truffle and React
+## Tools
+
+
+- Framework : Truffle
+- Smart contracts : Solidity
+- Front End: React
+
+## Running locally
 
 To start private network:
 ````
@@ -34,6 +43,6 @@ truffle test
 
 To run app locally :
 ```` 
-npm run dev
+npm run start
 ````
 

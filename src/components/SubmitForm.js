@@ -40,24 +40,22 @@ class SubmitForm extends Component {
       console.log("Saved to IPFS", data);
       console.log("IPFS hash:", hash);
 
-      let event = this.props.hashStoreContractInstance.NewHashStored({_hashSender: this.props.web3.eth.defaultAccount});
-      event.watch((error, log) => {
-        var hashId = log.args._hashId.toNumber();
-        this.setState({savingText: false});
-        this.props.onSubmit(hashId);
-        this.props.addNotification(`Data saved successfully ! Submission ID: ${hashId}`, "success");
-        event.stopWatching();
-      });
+      this.props.hashStoreContractInstance.save(hash, {value: this.state.price, gas: 200000}).then((result) => {
+        /* if(result.receipt.status !== "0x1"){ // can be used after byzantium to check status
+           throw new Error("Transaction failed");
+        } */
 
-      this.props.hashStoreContractInstance.save(hash, {value: this.state.price,gas: 200000}).catch((err) => {
+        this.setState({savingText: false});
+        console.log('Data saved successfully, Tx:', result.tx);
+        let log = result.logs[0];
+        let hashId = log.args._hashId.toNumber();
+        this.props.addNotification(`Data saved successfully ! Submission ID: ${hashId}`, "success");
+        setTimeout(() => this.props.onSubmit(hashId), 0); // leave time for state to be modified before querying
+      }).catch((err) => {
         this.setState({savingText: false});
         this.props.addNotification(err.message, "error");
-        event.stopWatching();
       });
-
     });
-
-
   }
 
   updateInputValue(e, field) {
