@@ -10,6 +10,16 @@ App live at #https://didil.github.io/stone-dapp/index.html
 
 This app was built using Truffle and React
 
+To start private network:
+````
+testrpc
+````
+
+Alternatively you can run a local Rinkeby testnet node:
+````
+geth --rinkeby --rpc --rpcapi db,eth,net,web3,personal --unlock="<DEPLOYER_ADDRESS>"
+````
+
 To deploy contract:
 ```` 
 truffle migrate
@@ -24,3 +34,4 @@ To run app locally :
 ```` 
 npm run dev
 ````
+
