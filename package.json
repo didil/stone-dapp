@@ -1,7 +1,6 @@
 {
   "name": "stone-dapp",
-  "version": "0.1.0",
-  "homepage": "stone-dapp",
+  "version": "1.0.0",
   "private": true,
   "devDependencies": {
     "autoprefixer": "6.5.1",
@@ -62,8 +61,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom",
-    "deploy-gh-pages": "gh-pages -d build_webpack/"
+    "test": "node scripts/test.js --env=jsdom"
   },
   "jest": {
     "collectCoverageFrom": [

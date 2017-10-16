@@ -2,10 +2,10 @@ pragma solidity ^0.4.11;
 
 
 contract HashStore {
-    struct Hash{
-        address sender;
-        string content;
-        uint timestamp;
+    struct Hash {
+    address sender;
+    string content;
+    uint timestamp;
     }
 
     mapping (uint => Hash) public hashes;
@@ -14,7 +14,8 @@ contract HashStore {
     uint public price;
 
     event OwnershipTransferred(address indexed _previousOwner, address indexed _newOwner);
-    event NewHashStored(address indexed _hashSender,uint _hashId, string _hashContent, uint timestamp);
+    event NewHashStored(address indexed _hashSender, uint _hashId, string _hashContent, uint timestamp);
+    event Withdrawn(address indexed _hashSender, uint amount);
 
     function HashStore(uint _price) public {
         require(_price > 0);
@@ -33,6 +34,12 @@ contract HashStore {
         require(newOwner != address(0));
         OwnershipTransferred(owner, newOwner);
         owner = newOwner;
+    }
+
+    function withdrawBalance() onlyOwner public {
+        var amount = this.balance;
+        owner.transfer(this.balance);
+        Withdrawn(owner, amount);
     }
 
     function save(string hashContent) payable public {
