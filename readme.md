@@ -6,6 +6,8 @@ It allows you to :
 - Receive a receipt for your text submission
 - Prove time of submission (via block timestamp)
 
+Submission price collected by the contract: 0.001 ETH
+
 ## Demo
 
 App live at: [https://stone-dapp.firebaseapp.com](https://stone-dapp.firebaseapp.com)
