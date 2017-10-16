@@ -93,7 +93,7 @@ code {
 }
 
 .footer-grid{
-  margin-top: 50px;
+  margin-top: 70px;
 }
 
 .green{
@@ -123,4 +123,12 @@ code {
 
 .loader{
   position: relative;
+}
+
+.fetch-form{
+  margin-bottom: 10px;
+}
+
+.submission-label{
+  padding-right: 10px;
 }

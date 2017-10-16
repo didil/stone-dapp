@@ -9,6 +9,7 @@ var Loader = require('react-loader');
 
 import SubmitForm from './components/SubmitForm';
 import RecentSubmissions from './components/RecentSubmissions';
+import FetchForm from './components/FetchForm';
 
 const IPFS = require('ipfs-mini');
 
@@ -25,7 +26,7 @@ class App extends Component {
       web3: null,
       submitFormDisplayed: false,
       fetchFormDisplayed: false,
-      recentSubmissions: []
+      recentSubmissionsDisplayed: false
     }
   }
 
@@ -96,7 +97,7 @@ class App extends Component {
       });
     }).catch((err) => {
       this.setState({loadingWeb3: false});
-      console.log('Error finding web3.',err.message);
+      console.log('Error finding web3.', err.message);
     });
   }
 
@@ -111,69 +112,32 @@ class App extends Component {
 
     hashStoreContract.deployed().then((hashStoreContractInstance) => {
       this.setState({hashStoreContractInstance});
-      this.loadRecentSubmissions();
     }).catch((err) => {
       this.addNotification(err.message, "error");
     });
   }
 
-  loadSubmission(hashId) {
-    return new Promise((resolve, reject) => {
-      let submission = {};
-      this.state.hashStoreContractInstance.find(hashId).then((values) => {
-        submission.sender = values[0];
-        submission.hashContent = values[1];
-        submission.timestamp = values[2].toNumber();
-        submission.hashId = hashId;
-        this.state.ipfs.catJSON(submission.hashContent, (err, data) => {
-          if (err) {
-            console.log(err);
-            return resolve(submission);
-          }
 
-          submission.title = data.title;
-          submission.text = data.text;
-          submission.fullName = data.fullName;
-          resolve(submission);
-        });
-      }).catch((err) => {
-        return reject(err);
-      });
-    });
-  }
-
-  async loadRecentSubmissions() {
-    this.setState({loadingRecentSubmissions: true, recentSubmissions: []});
-    try {
-      let recentSubmissions = [];
-      let lastHashId = await this.state.hashStoreContractInstance.lastHashId();
-      lastHashId = lastHashId.toNumber();
-      const startHashId = Math.max(1, lastHashId - 5);
-      for (let i = lastHashId; i >= startHashId; i--) {
-        let submission = await this.loadSubmission(i);
-        recentSubmissions.push(submission);
-      }
-      this.setState({loadingRecentSubmissions: false, recentSubmissions: recentSubmissions});
-    }
-    catch (err) {
-      this.setState({loadingRecentSubmissions: false});
-      this.addNotification(err.message, "error");
-    }
-  }
 
   onSubmit(hashId) {
     this.setState({submitFormDisplayed: false});
-
-    this.loadRecentSubmissions();
   }
 
   showSubmitForm() {
     this.setState({submitFormDisplayed: true});
     this.setState({fetchFormDisplayed: false});
+    this.setState({recentSubmissionsDisplayed: false});
   }
 
   showFetchForm() {
     this.setState({fetchFormDisplayed: true});
+    this.setState({submitFormDisplayed: false});
+    this.setState({recentSubmissionsDisplayed: false});
+  }
+
+  showRecentSubmissions() {
+    this.setState({recentSubmissionsDisplayed: true});
+    this.setState({fetchFormDisplayed: false});
     this.setState({submitFormDisplayed: false});
   }
 
@@ -232,8 +196,13 @@ class App extends Component {
                       </button>
                       <button className="pure-button pure-button-primary"
                               onClick={() => this.showFetchForm()}
-                              disabled={true || this.state.fetchFormDisplayed}>
-                        Fetch Previous Submission (To be implemented)
+                              disabled={this.state.fetchFormDisplayed}>
+                        Fetch Submission
+                      </button>
+                      <button className="pure-button pure-button-primary"
+                              onClick={() => this.showRecentSubmissions()}
+                              disabled={this.state.recentSubmissionsDisplayed}>
+                        Recent Submissions
                       </button>
 
                       {this.state.submitFormDisplayed ?
@@ -242,14 +211,23 @@ class App extends Component {
                                     addNotification={this.addNotification.bind(this)}
                                     onSubmit={this.onSubmit.bind(this)}/>
                         : null}
+
+                      {this.state.fetchFormDisplayed ?
+                        <FetchForm web3={this.state.web3} ipfs={this.state.ipfs}
+                                   addNotification={this.addNotification.bind(this)}
+                                   hashStoreContractInstance={this.state.hashStoreContractInstance}/>
+                        : null}
+
+                      {this.state.recentSubmissionsDisplayed ?
+                        <RecentSubmissions web3={this.state.web3} ipfs={this.state.ipfs}
+                                           hashStoreContractInstance={this.state.hashStoreContractInstance}
+                                           addNotification={this.addNotification.bind(this)}/>
+
+                        : null}
+
                     </div>
 
-                    <div className="pure-u-1-1">
-                      <h3>Recent Submissions</h3>
-                      <Loader loaded={!this.state.loadingRecentSubmissions}>
-                        <RecentSubmissions submissions={this.state.recentSubmissions}/>
-                      </Loader>
-                    </div>
+
                   </div>
                   :
                   noNetworkError
@@ -264,9 +242,17 @@ class App extends Component {
 
           <div className="pure-g footer-grid">
             <div className="pure-u-3-24"></div>
-            <div className="pure-u-18-24">
-              <em>Created by Adil Haritah - 2017 - Follow me on <a href="https://twitter.com/le_didil">Twitter</a> <a
-                href="https://github.com/didil">Github</a> </em>
+            <div className="pure-u-6-24">
+              <em>Created by Adil Haritah - 2017</em>
+            </div>
+            <div className="pure-u-2-24">
+              <a href="https://twitter.com/le_didil">Twitter</a>
+            </div>
+            <div className="pure-u-2-24">
+              <a href="https://github.com/didil">Github</a>
+            </div>
+            <div className="pure-u-2-24">
+              <a href="https://www.linkedin.com/in/adilha/">LinkedIn</a>
             </div>
             <div className="pure-u-3-24"></div>
           </div>

@@ -2,35 +2,27 @@ import React, {Component} from 'react'
 
 var Loader = require('react-loader');
 
-class RecentSubmissions extends Component {
+class FetchForm extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      loadingRecentSubmissions:false,
-      recentSubmissions: []
+      loadingSubmission: false,
+      submission: null
     };
   }
 
   componentWillMount() {
-    this.loadRecentSubmissions();
   }
 
-  async loadRecentSubmissions() {
-    this.setState({loadingRecentSubmissions: true, recentSubmissions: []});
+  async loadSubmissionById(hashId) {
+    this.setState({loadingSubmission: true, submission: null});
     try {
-      let recentSubmissions = [];
-      let lastHashId = await this.props.hashStoreContractInstance.lastHashId();
-      lastHashId = lastHashId.toNumber();
-      const startHashId = Math.max(1, lastHashId - 5);
-      for (let i = lastHashId; i >= startHashId; i--) {
-        let submission = await this.loadSubmission(i);
-        recentSubmissions.push(submission);
-      }
-      this.setState({loadingRecentSubmissions: false, recentSubmissions: recentSubmissions});
+      let submission = await this.loadSubmission(hashId);
+      this.setState({loadingSubmission: false, submission: submission});
     }
     catch (err) {
-      this.setState({loadingRecentSubmissions: false});
+      this.setState({loadingSubmission: false});
       this.props.addNotification(err.message, "error");
     }
   }
@@ -39,6 +31,10 @@ class RecentSubmissions extends Component {
     return new Promise((resolve, reject) => {
       let submission = {};
       this.props.hashStoreContractInstance.find(hashId).then((values) => {
+        if (values[0] === "0x0000000000000000000000000000000000000000") {
+          return reject(new Error("Submission not found"));
+        }
+
         submission.sender = values[0];
         submission.hashContent = values[1];
         submission.timestamp = values[2].toNumber();
@@ -85,24 +81,39 @@ class RecentSubmissions extends Component {
           </div>
           <div className="pure-u-5-5">
             <label className="submission-label">IPFS Hash:</label>
-            <a className="submission-hash-content"   target="_blank"
+            <a className="submission-hash-content" target="_blank"
                href={`https://ipfs.infura.io:5001/api/v0/cat/${submission.hashContent}`}>{submission.hashContent}</a>
           </div>
           <div className="pure-u-5-5">
             <label className="submission-label">Timestamp:</label>
-            <span className="submission-timestamp">{new Date(submission.timestamp*1000).toISOString()}</span>
+            <span className="submission-timestamp">{new Date(submission.timestamp * 1000).toISOString()}</span>
           </div>
         </div>
       </div>);
   }
 
+  updateHashId(e) {
+    this.setState({'hashId': e.target.value});
+  }
+
   render() {
     return (
-      <div className="RecentSubmissions">
+      <div className="FetchForm">
+        <h3>Fetch Submission</h3>
+        <form className="pure-form fetch-form">
+          <fieldset className="pure-group">
+            <input type="text" className="pure-input-1-2" placeholder="Submission Id"
+                   value={this.state.hashId} onChange={e => this.updateHashId(e)}/>
+          </fieldset>
+
+          <button type="button" className="pure-button pure-input-1-2 button-success"
+                  disabled={this.state.loadingSubmission} onClick={() => this.loadSubmissionById(this.state.hashId)}>
+            Fetch
+          </button>
+        </form>
         <div className="pure-u-1-1">
-          <h3>Recent Submissions</h3>
-          <Loader loaded={!this.state.loadingRecentSubmissions}>
-            {this.state.recentSubmissions.map((submission) => this.renderSubmission(submission))}
+          <Loader loaded={!this.state.loadingSubmission}>
+            {this.state.submission ? this.renderSubmission(this.state.submission) : null}
           </Loader>
         </div>
       </div>
@@ -110,4 +121,4 @@ class RecentSubmissions extends Component {
   }
 }
 
-export default RecentSubmissions;
+export default FetchForm;

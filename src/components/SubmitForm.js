@@ -50,7 +50,7 @@ class SubmitForm extends Component {
         let log = result.logs[0];
         let hashId = log.args._hashId.toNumber();
         this.props.addNotification(`Data saved successfully ! Submission ID: ${hashId}`, "success");
-        setTimeout(() => this.props.onSubmit(hashId), 0); // leave time for state to be modified before querying
+        this.props.onSubmit(hashId);
       }).catch((err) => {
         this.setState({savingText: false});
         this.props.addNotification(err.message, "error");
