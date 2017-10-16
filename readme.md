@@ -8,7 +8,9 @@ It allows you to :
 
 ## Demo
 
-App live at #https://didil.github.io/stone-dapp/index.html
+App live at: [https://stone-dapp.firebaseapp.com](https://stone-dapp.firebaseapp.com)
+
+Deployed Contract on Rinkeby: [0x481f5c806e4af895739cc745de1c799aa16a0682](https://rinkeby.etherscan.io/address/0x481f5c806e4af895739cc745de1c799aa16a0682)
 
 ## Tools
 
